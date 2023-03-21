@@ -4,14 +4,14 @@ type PasswordValidatorResponse = {
 }
 
 type ValidatorResult = string | undefined
-type ValidationResult = (password: string) => string[]
+type Validator = (password: string) => string[]
 
 export const validateMinLength = (minLength: number) => (password: string): ValidatorResult => password.length < minLength ? "too short" : undefined
 export const validateMaxLength = (maxLength: number) => (password: string): ValidatorResult => password.length > maxLength ? "too long" : undefined
 export const validateNumbers = (password: string) => !!password.match(/\d/g) ? undefined : "missing number"
 export const validateUppercaseLetter = (password: string) => !!password.match(/[A-Z]/g) ? undefined : "missing uppercase letter"
 
-const validatePassword = (password: string, validator: ValidationResult): PasswordValidatorResponse => {
+const validatePassword = (password: string, validator: Validator): PasswordValidatorResponse => {
   const errors = validator(password)
   return {
     valid: errors.length === 0,
@@ -21,6 +21,6 @@ const validatePassword = (password: string, validator: ValidationResult): Passwo
 
 export const validatorPipe = (fns: Function[]) => (password: string): string[] => fns.map(fn => fn(password)).filter(item => item !== undefined)
 
-export const createValidator = (validator: ValidationResult) => (password: string) => {
+export const createValidator = (validator: Validator) => (password: string) => {
   return validatePassword(password, validator)
 }
